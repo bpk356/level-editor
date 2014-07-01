@@ -5,3 +5,5 @@
 *.suo
 *.user
 *.sln.docstates
+LevelGenerator/bin/
+LevelGenerator/obj/

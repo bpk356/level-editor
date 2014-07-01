@@ -38,7 +38,7 @@ namespace LevelGenerator
 
         public void Draw(Color color, bool drawVelocity, Rect screenBounds)
         {
-            DrawHelper.DrawCircle(Position, Radius, color, screenBounds);
+            DrawHelper.DrawCircle(Position, Radius * 2, color, screenBounds);
             if (drawVelocity)
             {
                 DrawHelper.DrawVelocity(Position, Velocity, color, screenBounds);
