@@ -95,13 +95,13 @@ namespace LevelGenerator
                     return false;
                 }
 
-                if ((ControlledBody.Position - GoalArea.CenterPoint).Magnitude() < GoalArea.Radius)
+                if ((ControlledBody.Position - GoalArea.CenterPoint).Magnitude() < GoalArea.Radius - ControlledBody.Radius / 2.0f)
                 {
                     winPosition = new Vector2(ControlledBody.Position);
                     return true;
                 }
 
-                if (checkAvoidArea && (ControlledBody.Position - AvoidArea.CenterPoint).Magnitude() < AvoidArea.Radius)
+                if (checkAvoidArea && (ControlledBody.Position - AvoidArea.CenterPoint).Magnitude() < AvoidArea.Radius + ControlledBody.Radius / 2.0f)
                 {
                     return false;
                 }

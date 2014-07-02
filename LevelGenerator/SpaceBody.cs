@@ -14,7 +14,7 @@ namespace LevelGenerator
         public Vector2 Position { get; set; }
         public Vector2 Velocity { get; set; }
         public int Radius { get; set; }
-        public float Mass { get { return (float)Math.Pow(10, Radius); } }
+        public float Mass { get { return (float)Math.Pow(10, Radius / 2); } }
 
         public const int MutatableAttributeCount = Vector2.MutatableAttributeCount * 2 + 2;
 
@@ -38,7 +38,7 @@ namespace LevelGenerator
 
         public void Draw(Color color, bool drawVelocity, Rect screenBounds)
         {
-            DrawHelper.DrawCircle(Position, Radius * 2, color, screenBounds);
+            DrawHelper.DrawCircle(Position, Radius, color, screenBounds);
             if (drawVelocity)
             {
                 DrawHelper.DrawVelocity(Position, Velocity, color, screenBounds);
