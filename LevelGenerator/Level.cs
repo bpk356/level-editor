@@ -26,6 +26,17 @@ namespace LevelGenerator
         {
         }
 
+        public IEnumerable<IDraggableObject> GetDraggableObjects()
+        {
+            foreach (var independentBody in IndependentBodies)
+            {
+                yield return independentBody;
+            }
+            yield return GoalArea;
+            yield return AvoidArea;
+            yield return ControlledBody;
+        }
+
         public Level(int independentBodyCount, Random generator, Rect bounds)
         {
             IndependentBodies = new List<SpaceBody>();
@@ -41,13 +52,13 @@ namespace LevelGenerator
 
         public void Draw(Rect screenBounds)
         {
-            GoalArea.Draw(Color.FromArgb(50, Color.Green), screenBounds);
-            AvoidArea.Draw(Color.FromArgb(50, Color.Red), screenBounds);
+            GoalArea.Draw(Color.FromArgb(128, Color.Green), screenBounds);
+            AvoidArea.Draw(Color.FromArgb(128, Color.Red), screenBounds);
             foreach (var independentBody in IndependentBodies)
             {
-                independentBody.Draw(Color.FromArgb(50, Color.Blue), true, screenBounds);
+                independentBody.Draw(Color.FromArgb(128, Color.Blue), true, screenBounds);
             }
-            ControlledBody.Draw(Color.FromArgb(50, Color.SkyBlue), false, screenBounds);
+            ControlledBody.Draw(Color.FromArgb(128, Color.SkyBlue), false, screenBounds);
         }
 
         public bool EverythingVisible(Rect screenBounds)

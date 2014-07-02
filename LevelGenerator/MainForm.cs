@@ -23,6 +23,8 @@ namespace LevelGenerator
         SimulationState _simulationState;
         List<Control> _generatedControls;
         bool DifficultyEvaluationCancelRequested;
+        IDraggableObject _draggingObject;
+        Vector2 _draggingOffset;
 
         public MainForm()
         {
@@ -269,20 +271,28 @@ namespace LevelGenerator
 
         private void DisplayGLControl_MouseClick(object sender, MouseEventArgs e)
         {
-            if (e.Button == System.Windows.Forms.MouseButtons.Left)
+            if (e.Button == System.Windows.Forms.MouseButtons.Right)
             {
-                BeginSimulating(e.X, e.Y);
+                if (_simulationState != null)
+                {
+                    EndSimulating();
+                }
+                else
+                {
+                    BeginSimulating(e.X, e.Y);
+                }
             }
-            else if (e.Button == System.Windows.Forms.MouseButtons.Right)
-            {
-                EndSimulating();
-            }
+        }
+
+        private Vector2 GLControlMousePositionToWorldCoordinates(int x, int y)
+        {
+            return new Vector2(_screenBounds.MinX + x, _screenBounds.MaxY - 1 - y);
         }
 
         private void BeginSimulating(int x, int y)
         {
             SimulationTimer.Stop();
-            _simulationState = new SimulationState(_bestLevel, new Vector2(_screenBounds.MinX + x, _screenBounds.MaxY - 1 - y));
+            _simulationState = new SimulationState(_bestLevel, GLControlMousePositionToWorldCoordinates(x,y));
             SimulationTimer.Start();
         }
 
@@ -417,6 +427,53 @@ namespace LevelGenerator
         private void RecalculateBackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             RecalculateButton.Text = "Recalculate";
+        }
+
+        private void DisplayGLControl_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button != System.Windows.Forms.MouseButtons.Left)
+            {
+                return;
+            }
+            Vector2 mousePosition = GLControlMousePositionToWorldCoordinates(e.X, e.Y);
+            _draggingObject = null;
+            float closestDraggableObjectDistance = 0.0f;
+            foreach (var draggable in _bestLevel.GetDraggableObjects())
+            {
+                if (!draggable.MouseIsOnObject(mousePosition))
+                {
+                    continue;
+                }
+                if (draggable.DistanceFromMouse(mousePosition) < closestDraggableObjectDistance || _draggingObject == null)
+                {
+                    _draggingObject = draggable;
+                    closestDraggableObjectDistance = draggable.DistanceFromMouse(mousePosition);
+                }
+            }
+            if (_draggingObject != null)
+            {
+                _draggingOffset = _draggingObject.OffsetFromMouse(mousePosition);
+            }
+
+        }
+
+        private void DisplayGLControl_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_draggingObject == null)
+            {
+                return;
+            }
+            Vector2 mousePosition = GLControlMousePositionToWorldCoordinates(e.X, e.Y);
+            Vector2 newObjectPosition = mousePosition + _draggingOffset;
+            _draggingObject.UpdatePosition(newObjectPosition);
+            UpdateControls();
+            UpdatePicture();
+            DisplayGLControl.Update();
+        }
+
+        private void DisplayGLControl_MouseUp(object sender, MouseEventArgs e)
+        {
+            _draggingObject = null;
         }
     }
 }

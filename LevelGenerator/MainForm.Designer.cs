@@ -77,6 +77,9 @@
             this.DisplayGLControl.VSync = false;
             this.DisplayGLControl.Paint += new System.Windows.Forms.PaintEventHandler(this.DisplayGLControl_Paint);
             this.DisplayGLControl.MouseClick += new System.Windows.Forms.MouseEventHandler(this.DisplayGLControl_MouseClick);
+            this.DisplayGLControl.MouseDown += new System.Windows.Forms.MouseEventHandler(this.DisplayGLControl_MouseDown);
+            this.DisplayGLControl.MouseMove += new System.Windows.Forms.MouseEventHandler(this.DisplayGLControl_MouseMove);
+            this.DisplayGLControl.MouseUp += new System.Windows.Forms.MouseEventHandler(this.DisplayGLControl_MouseUp);
             // 
             // SimulationTimer
             // 

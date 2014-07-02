@@ -7,7 +7,7 @@ using System.Drawing;
 
 namespace LevelGenerator
 {
-    class Circle
+    class Circle : IDraggableObject
     {
         public Vector2 CenterPoint { get; set; }
         public float Radius { get; set; }
@@ -74,5 +74,29 @@ namespace LevelGenerator
         {
             DrawHelper.DrawCircle(CenterPoint, Radius, color, screenBounds);
         }
+
+        #region IDraggableObject Members
+
+        public bool MouseIsOnObject(Vector2 mousePosition)
+        {
+            return DistanceFromMouse(mousePosition) <= Radius;
+        }
+
+        public float DistanceFromMouse(Vector2 mousePosition)
+        {
+            return OffsetFromMouse(mousePosition).Magnitude();
+        }
+
+        public Vector2 OffsetFromMouse(Vector2 mousePosition)
+        {
+            return CenterPoint - mousePosition;
+        }
+
+        public void UpdatePosition(Vector2 newPosition)
+        {
+            CenterPoint = new Vector2(newPosition);
+        }
+
+        #endregion
     }
 }

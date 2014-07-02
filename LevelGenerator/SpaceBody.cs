@@ -7,21 +7,21 @@ using System.Drawing;
 
 namespace LevelGenerator
 {
-    class SpaceBody
+    class SpaceBody : IDraggableObject
     {
         public const float GravityForce = 40000.0f;
 
         public Vector2 Position { get; set; }
         public Vector2 Velocity { get; set; }
         public int Radius { get; set; }
-        public float Mass { get { return (float)Math.Pow(10, Radius / 2); } }
+        public float Mass { get { return (float)Math.Pow(10, Radius / 4); } }
 
         public const int MutatableAttributeCount = Vector2.MutatableAttributeCount * 2 + 2;
 
         public SpaceBody(Random generator, Rect bounds)
         {
             Position = new Vector2((float)generator.NextDouble() * bounds.Width + bounds.MinX, (float)generator.NextDouble() * bounds.Height + bounds.MinY);
-            Radius = generator.Next(3) + 2;
+            Radius = generator.Next(10) + 4;
             do
             {
                 Velocity = new Vector2((float)generator.NextDouble() * bounds.Width + bounds.MinX, (float)generator.NextDouble() * bounds.Height + bounds.MinY);
@@ -103,5 +103,29 @@ namespace LevelGenerator
             Vector2 nextPosition = Position + Velocity;
             return !bounds.ContainsPoint(nextPosition);
         }
+
+        #region IDraggableObject Members
+
+        public bool MouseIsOnObject(Vector2 mousePosition)
+        {
+            return DistanceFromMouse(mousePosition) <= Radius + 1.0f;
+        }
+
+        public float DistanceFromMouse(Vector2 mousePosition)
+        {
+            return OffsetFromMouse(mousePosition).Magnitude();
+        }
+
+        public Vector2 OffsetFromMouse(Vector2 mousePosition)
+        {
+            return Position - mousePosition;
+        }
+
+        public void UpdatePosition(Vector2 newPosition)
+        {
+            Position = new Vector2(newPosition);
+        }
+
+        #endregion
     }
 }
