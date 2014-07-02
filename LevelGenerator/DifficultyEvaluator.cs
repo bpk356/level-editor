@@ -46,24 +46,38 @@ namespace LevelGenerator
             }
             while (outerValues.Count > 0)
             {
-                int outerIndex = generator.Next(outerValues.Count);
-                int outerX = outerValues[outerIndex].Item1;
-                int outerY = outerValues[outerIndex].Item2;
-                //for (int xOffset = 40 + outerX; xOffset < screenBounds.Width - 40; xOffset += resolution * 8)
-                //{
-                //Console.WriteLine("Evaluting x = " + xOffset);
-                //for (int yOffset = 40 + outerY; yOffset < screenBounds.Height - 40; yOffset += resolution * 8)
-                //{
-                int xOffset = outerX;
-                int yOffset = outerY;
-                bool cancelRequested = EvaluateMousePosition(level, screenBounds, resolution, tryDictionary, updatePictureFunc, ref winCount, ref lossCount, ref offscreenWinCount, ref onscreenWinCount, ref minControlledBodyTravelDistanceOnWin, ref minTravelDistanceOnWin, ref wouldHaveWons, xOffset, yOffset);
+                Dictionary<Vector2, bool> tempTryDictionary = new Dictionary<Vector2, bool>();
+                Enumerable.Range(0, 1000)
+                    .AsParallel()
+                    .ForAll(throwAway =>
+                        {
+                            if (outerValues.Count == 0)
+                            {
+                                return;
+                            }
+                            int xOffset;
+                            int yOffset;
+                            lock (outerValues)
+                            {
+                                int outerIndex = generator.Next(outerValues.Count);
+                                xOffset = outerValues[outerIndex].Item1;
+                                yOffset = outerValues[outerIndex].Item2;
+                                outerValues.RemoveAt(outerIndex);
+                            }
+                            EvaluateMousePosition(level, screenBounds, resolution, tempTryDictionary, ref winCount, ref lossCount, ref offscreenWinCount, ref onscreenWinCount, ref minControlledBodyTravelDistanceOnWin, ref minTravelDistanceOnWin, ref wouldHaveWons, xOffset, yOffset);
+                        });
+                lock (tryDictionary)
+                {
+                    foreach (var kvp in tempTryDictionary)
+                    {
+                        tryDictionary.Add(kvp.Key, kvp.Value);
+                    }
+                }
+                bool cancelRequested = updatePictureFunc();
                 if (cancelRequested)
                 {
                     return 0.0;
                 }
-                //}
-                //}//);
-                outerValues.RemoveAt(outerIndex);
             }
             interestingness *= minTravelDistanceOnWin;
             interestingness *= (float)onscreenWinCount / (onscreenWinCount + offscreenWinCount);
@@ -76,7 +90,7 @@ namespace LevelGenerator
             return (double)winCount / (winCount + lossCount);
         }
 
-        private static bool EvaluateMousePosition(Level level, Rect screenBounds, int resolution, Dictionary<Vector2, bool> tryDictionary, Func<bool> updatePictureFunc, ref int winCount, ref int lossCount, ref int offscreenWinCount, ref int onscreenWinCount, ref float minControlledBodyTravelDistanceOnWin, ref float minTravelDistanceOnWin, ref int wouldHaveWons, int xOffset, int yOffset)
+        private static void EvaluateMousePosition(Level level, Rect screenBounds, int resolution, Dictionary<Vector2, bool> tryDictionary, ref int winCount, ref int lossCount, ref int offscreenWinCount, ref int onscreenWinCount, ref float minControlledBodyTravelDistanceOnWin, ref float minTravelDistanceOnWin, ref int wouldHaveWons, int xOffset, int yOffset)
         {
             Vector2 mousePosition = new Vector2(screenBounds.MinX + xOffset, screenBounds.MinY + yOffset);
             SimulationState simulationState = new SimulationState(level, mousePosition);
@@ -130,22 +144,6 @@ namespace LevelGenerator
                     wouldHaveWons += resolution * resolution;
                 }
             }
-            bool willUpdate = false;
-            lock (tryDictionary)
-            {
-                if ((tryDictionary.Count % 1000) == 0)
-                {
-                    willUpdate = true;
-                }
-            }
-            if (willUpdate)
-            {
-                if (updatePictureFunc())
-                {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 }
