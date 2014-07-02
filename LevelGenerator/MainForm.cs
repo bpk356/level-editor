@@ -36,7 +36,14 @@ namespace LevelGenerator
 
         private void UpdatePicture()
         {
-            DisplayGLControl.Invalidate();
+            if (DisplayGLControl.InvokeRequired)
+            {
+                DisplayGLControl.Invoke(new Action(UpdatePicture));
+            }
+            else
+            {
+                DisplayGLControl.Invalidate();
+            }
         }
 
         private void TunerBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -46,7 +53,7 @@ namespace LevelGenerator
                 Level newLevel = new Level(1, _generator, _screenBounds);
                 double newInterestingness;
                 Dictionary<Vector2, bool> tryDictionary;
-                double newDifficulty = DifficultyEvaluator.EvaluateDifficulty(newLevel, _screenBounds, 16, out newInterestingness, out tryDictionary);
+                double newDifficulty = DifficultyEvaluator.EvaluateDifficulty(newLevel, _screenBounds, 16, out newInterestingness, out tryDictionary, UpdatePicture);
 
                 if (newDifficulty > .0001 && newInterestingness > _bestInterestingness || RequestRestart)
                 {
@@ -90,50 +97,118 @@ namespace LevelGenerator
                 _generatedControls = new List<Control>();
 
                 int currentY = IndependentBodyCountUpDown.Location.Y + 30;
-                foreach (var independentBody in _bestLevel.IndependentBodies)
-                {
-                    Label positionLabel = new Label();
-                    positionLabel.Text = "Position";
-                    positionLabel.AutoSize = true;
-                    positionLabel.Location = new System.Drawing.Point(10, currentY);
-                    positionLabel.Size = new System.Drawing.Size(102, 13);
-                    Controls.Add(positionLabel);
-                    _generatedControls.Add(positionLabel);
+                currentY = UpdateIndependentBodyControls(currentY);
+                UpdateAvoidAreaControls(currentY);
 
-                    NumericUpDown xPosition = new NumericUpDown();
-                    xPosition.Minimum = (decimal)_screenBounds.MinX;
-                    xPosition.Maximum = (decimal)_screenBounds.MaxX;
-                    xPosition.Size = new System.Drawing.Size(60, 20);
-                    xPosition.Location = new System.Drawing.Point(80, currentY - 3);
-                    xPosition.Name = "0,x";
-                    xPosition.ValueChanged += IndependentBodyPosition_ValueChanged;
-                    xPosition.Value = (decimal)independentBody.Position.X;
-                    Controls.Add(xPosition);
-                    _generatedControls.Add(xPosition);
-
-                    NumericUpDown yPosition = new NumericUpDown();
-                    yPosition.Minimum = (decimal)_screenBounds.MinY;
-                    yPosition.Maximum = (decimal)_screenBounds.MaxY;
-                    yPosition.Size = new System.Drawing.Size(60, 20);
-                    yPosition.Location = new System.Drawing.Point(145, currentY - 3);
-                    yPosition.Name = "0,y";
-                    yPosition.ValueChanged += IndependentBodyPosition_ValueChanged;
-                    yPosition.Value = (decimal)independentBody.Position.Y;
-                    Controls.Add(yPosition);
-                    _generatedControls.Add(yPosition);
-
-                    NumericUpDown mass = new NumericUpDown();
-                    mass.Minimum = (decimal)1;
-                    mass.Maximum = (decimal)20;
-                    mass.Size = new System.Drawing.Size(60, 20);
-                    mass.Location = new System.Drawing.Point(210, currentY - 3);
-                    mass.Name = "0,mass";
-                    mass.ValueChanged += IndependentBodyPosition_ValueChanged;
-                    mass.Value = (decimal)independentBody.Radius;
-                    Controls.Add(mass);
-                    _generatedControls.Add(mass);
-                }
             }
+        }
+
+        private void UpdateAvoidAreaControls(int currentY)
+        {
+            Point location = AvoidAreasLabel.Location;
+            location.Y = currentY;
+            AvoidAreasLabel.Location = location;
+
+            location = AvoidAreaCountUpDown.Location;
+            location.Y = currentY;
+            AvoidAreaCountUpDown.Location = location;
+            AvoidAreaCountUpDown.Value = 1;//(decimal)_bestLevel.AvoidArea
+            currentY += 35;
+
+            Label positionLabel = new Label();
+            positionLabel.Text = "Position";
+            positionLabel.AutoSize = true;
+            positionLabel.Location = new System.Drawing.Point(10, currentY);
+            positionLabel.Size = new System.Drawing.Size(102, 13);
+            Controls.Add(positionLabel);
+            _generatedControls.Add(positionLabel);
+
+            NumericUpDown xPosition = new NumericUpDown();
+            xPosition.Minimum = (decimal)_screenBounds.MinX;
+            xPosition.Maximum = (decimal)_screenBounds.MaxX;
+            xPosition.Size = new System.Drawing.Size(60, 20);
+            xPosition.Location = new System.Drawing.Point(80, currentY - 3);
+            xPosition.Name = "0,x";
+            xPosition.ValueChanged += AvoidArea_ValueChanged;
+            xPosition.Value = (decimal)_bestLevel.AvoidArea.CenterPoint.X;
+            Controls.Add(xPosition);
+            _generatedControls.Add(xPosition);
+
+            NumericUpDown yPosition = new NumericUpDown();
+            yPosition.Minimum = (decimal)_screenBounds.MinY;
+            yPosition.Maximum = (decimal)_screenBounds.MaxY;
+            yPosition.Size = new System.Drawing.Size(60, 20);
+            yPosition.Location = new System.Drawing.Point(145, currentY - 3);
+            yPosition.Name = "0,y";
+            yPosition.ValueChanged += AvoidArea_ValueChanged;
+            yPosition.Value = (decimal)_bestLevel.AvoidArea.CenterPoint.Y;
+            Controls.Add(yPosition);
+            _generatedControls.Add(yPosition);
+
+            NumericUpDown radius = new NumericUpDown();
+            radius.Minimum = (decimal)1;
+            radius.Maximum = (decimal)1000;
+            radius.Size = new System.Drawing.Size(60, 20);
+            radius.Location = new System.Drawing.Point(210, currentY - 3);
+            radius.Name = "0,radius";
+            radius.ValueChanged += AvoidArea_ValueChanged;
+            radius.Value = (decimal)_bestLevel.AvoidArea.Radius;
+            Controls.Add(radius);
+            _generatedControls.Add(radius);
+
+            currentY += 35;
+        }
+
+        private int UpdateIndependentBodyControls(int currentY)
+        {
+            int independentBodyI = 0;
+            foreach (var independentBody in _bestLevel.IndependentBodies)
+            {
+                Label positionLabel = new Label();
+                positionLabel.Text = "Position";
+                positionLabel.AutoSize = true;
+                positionLabel.Location = new System.Drawing.Point(10, currentY);
+                positionLabel.Size = new System.Drawing.Size(102, 13);
+                Controls.Add(positionLabel);
+                _generatedControls.Add(positionLabel);
+
+                NumericUpDown xPosition = new NumericUpDown();
+                xPosition.Minimum = (decimal)_screenBounds.MinX;
+                xPosition.Maximum = (decimal)_screenBounds.MaxX;
+                xPosition.Size = new System.Drawing.Size(60, 20);
+                xPosition.Location = new System.Drawing.Point(80, currentY - 3);
+                xPosition.Name = independentBodyI + ",x";
+                xPosition.ValueChanged += IndependentBodyPosition_ValueChanged;
+                xPosition.Value = (decimal)independentBody.Position.X;
+                Controls.Add(xPosition);
+                _generatedControls.Add(xPosition);
+
+                NumericUpDown yPosition = new NumericUpDown();
+                yPosition.Minimum = (decimal)_screenBounds.MinY;
+                yPosition.Maximum = (decimal)_screenBounds.MaxY;
+                yPosition.Size = new System.Drawing.Size(60, 20);
+                yPosition.Location = new System.Drawing.Point(145, currentY - 3);
+                yPosition.Name = independentBodyI + ",y";
+                yPosition.ValueChanged += IndependentBodyPosition_ValueChanged;
+                yPosition.Value = (decimal)independentBody.Position.Y;
+                Controls.Add(yPosition);
+                _generatedControls.Add(yPosition);
+
+                NumericUpDown mass = new NumericUpDown();
+                mass.Minimum = (decimal)1;
+                mass.Maximum = (decimal)20;
+                mass.Size = new System.Drawing.Size(60, 20);
+                mass.Location = new System.Drawing.Point(210, currentY - 3);
+                mass.Name = independentBodyI + ",mass";
+                mass.ValueChanged += IndependentBodyPosition_ValueChanged;
+                mass.Value = (decimal)independentBody.Radius;
+                Controls.Add(mass);
+                _generatedControls.Add(mass);
+
+                independentBodyI++;
+                currentY += 35;
+            }
+            return currentY;
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -166,9 +241,12 @@ namespace LevelGenerator
             {
                 if (_bestTryDictionary != null)
                 {
-                    foreach (var kvp in _bestTryDictionary)
+                    lock (_bestTryDictionary)
                     {
-                        DrawHelper.SetPixel(kvp.Key, kvp.Value ? Color.White : Color.Red, _screenBounds);
+                        foreach (var kvp in _bestTryDictionary)
+                        {
+                            DrawHelper.SetPixel(kvp.Key, kvp.Value ? Color.White : Color.Red, _screenBounds);
+                        }
                     }
                 }
 
@@ -221,9 +299,7 @@ namespace LevelGenerator
         {
             RecalculateButton.Enabled = false;
             RecalculateButton.Update();
-            _bestDifficulty = DifficultyEvaluator.EvaluateDifficulty(_bestLevel, _screenBounds, 8, out _bestInterestingness, out _bestTryDictionary);
-            UpdatePicture();
-            RecalculateButton.Enabled = true;
+            RecalculateBackgroundWorker.RunWorkerAsync();
         }
 
         private void ControlledBodyXPositionUpDown_ValueChanged(object sender, EventArgs e)
@@ -282,6 +358,49 @@ namespace LevelGenerator
                 _bestLevel.IndependentBodies[index].Radius = (int)upDownSender.Value;
             }
             UpdatePicture();
+        }
+
+        private void IndependentBodyCountUpDown_ValueChanged(object sender, EventArgs e)
+        {
+            int newIndependentBodyCount = (int)IndependentBodyCountUpDown.Value;
+            while (_bestLevel.IndependentBodies.Count > newIndependentBodyCount)
+            {
+                _bestLevel.IndependentBodies.RemoveAt(_bestLevel.IndependentBodies.Count - 1);
+            }
+            while (_bestLevel.IndependentBodies.Count < newIndependentBodyCount)
+            {
+                _bestLevel.IndependentBodies.Add(new SpaceBody(_generator, _screenBounds));
+            }
+            UpdateControls();
+        }
+
+        private void AvoidArea_ValueChanged(object sender, EventArgs e)
+        {
+            NumericUpDown upDownSender = (NumericUpDown)sender;
+            string[] parts = upDownSender.Name.Split(',');
+            int index = int.Parse(parts[0]);
+            string axis = parts[1];
+
+            if (axis == "x")
+            {
+                _bestLevel.AvoidArea.CenterPoint.X = (float)upDownSender.Value;
+            }
+            else if (axis == "y")
+            {
+                _bestLevel.AvoidArea.CenterPoint.Y = (float)upDownSender.Value;
+            }
+            else if (axis == "radius")
+            {
+                _bestLevel.AvoidArea.Radius = (int)upDownSender.Value;
+            }
+            UpdatePicture();
+        }
+
+        private void RecalculateBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            _bestDifficulty = DifficultyEvaluator.EvaluateDifficulty(_bestLevel, _screenBounds, 1, out _bestInterestingness, out _bestTryDictionary, UpdatePicture);
+            UpdatePicture();
+            RecalculateButton.Enabled = true;
         }
     }
 }

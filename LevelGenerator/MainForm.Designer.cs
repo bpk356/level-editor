@@ -45,6 +45,9 @@
             this.GoalAreaYPositionUpDown = new System.Windows.Forms.NumericUpDown();
             this.label5 = new System.Windows.Forms.Label();
             this.IndependentBodyCountUpDown = new System.Windows.Forms.NumericUpDown();
+            this.AvoidAreasLabel = new System.Windows.Forms.Label();
+            this.AvoidAreaCountUpDown = new System.Windows.Forms.NumericUpDown();
+            this.RecalculateBackgroundWorker = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)(this.ControlledBodyXPositionUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ControlledBodyYPositionUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ControlledBodyMassUpDown)).BeginInit();
@@ -52,6 +55,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.GoalAreaXPositionUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.GoalAreaYPositionUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.IndependentBodyCountUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.AvoidAreaCountUpDown)).BeginInit();
             this.SuspendLayout();
             // 
             // DifficultyLabel
@@ -258,12 +262,35 @@
             this.IndependentBodyCountUpDown.Name = "IndependentBodyCountUpDown";
             this.IndependentBodyCountUpDown.Size = new System.Drawing.Size(60, 20);
             this.IndependentBodyCountUpDown.TabIndex = 23;
+            this.IndependentBodyCountUpDown.ValueChanged += new System.EventHandler(this.IndependentBodyCountUpDown_ValueChanged);
+            // 
+            // AvoidAreasLabel
+            // 
+            this.AvoidAreasLabel.AutoSize = true;
+            this.AvoidAreasLabel.Location = new System.Drawing.Point(52, 230);
+            this.AvoidAreasLabel.Name = "AvoidAreasLabel";
+            this.AvoidAreasLabel.Size = new System.Drawing.Size(64, 13);
+            this.AvoidAreasLabel.TabIndex = 24;
+            this.AvoidAreasLabel.Text = "Avoid Areas";
+            // 
+            // AvoidAreaCountUpDown
+            // 
+            this.AvoidAreaCountUpDown.Location = new System.Drawing.Point(130, 228);
+            this.AvoidAreaCountUpDown.Name = "AvoidAreaCountUpDown";
+            this.AvoidAreaCountUpDown.Size = new System.Drawing.Size(60, 20);
+            this.AvoidAreaCountUpDown.TabIndex = 25;
+            // 
+            // RecalculateBackgroundWorker
+            // 
+            this.RecalculateBackgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.RecalculateBackgroundWorker_DoWork);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1360, 758);
+            this.Controls.Add(this.AvoidAreaCountUpDown);
+            this.Controls.Add(this.AvoidAreasLabel);
             this.Controls.Add(this.IndependentBodyCountUpDown);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.GoalAreaYPositionUpDown);
@@ -289,6 +316,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.GoalAreaXPositionUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.GoalAreaYPositionUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.IndependentBodyCountUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.AvoidAreaCountUpDown)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -312,6 +340,9 @@
         private System.Windows.Forms.NumericUpDown GoalAreaYPositionUpDown;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.NumericUpDown IndependentBodyCountUpDown;
+        private System.Windows.Forms.Label AvoidAreasLabel;
+        private System.Windows.Forms.NumericUpDown AvoidAreaCountUpDown;
+        private System.ComponentModel.BackgroundWorker RecalculateBackgroundWorker;
     }
 }
 
