@@ -22,6 +22,7 @@ namespace LevelGenerator
         bool RequestRestart;
         SimulationState _simulationState;
         List<Control> _generatedControls;
+        bool DifficultyEvaluationCancelRequested;
 
         public MainForm()
         {
@@ -32,18 +33,21 @@ namespace LevelGenerator
             _screenBounds = new Rect(-960 / 2, -640 / 2, 960 / 2, 640 / 2);
             _bestLevel = new Level(1, _generator, _screenBounds);
             UpdateControls();
+            DifficultyEvaluationCancelRequested = false;
         }
 
-        private void UpdatePicture()
+        private bool UpdatePicture()
         {
             if (DisplayGLControl.InvokeRequired)
             {
-                DisplayGLControl.Invoke(new Action(UpdatePicture));
+                DisplayGLControl.Invoke(new Func<bool>(UpdatePicture));
             }
             else
             {
                 DisplayGLControl.Invalidate();
             }
+
+            return DifficultyEvaluationCancelRequested;
         }
 
         private void TunerBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -53,7 +57,7 @@ namespace LevelGenerator
                 Level newLevel = new Level(1, _generator, _screenBounds);
                 double newInterestingness;
                 Dictionary<Vector2, bool> tryDictionary;
-                double newDifficulty = DifficultyEvaluator.EvaluateDifficulty(newLevel, _screenBounds, 16, out newInterestingness, out tryDictionary, UpdatePicture);
+                double newDifficulty = DifficultyEvaluator.EvaluateDifficulty(newLevel, _screenBounds, 2, out newInterestingness, out tryDictionary, UpdatePicture);
 
                 if (newDifficulty > .0001 && newInterestingness > _bestInterestingness || RequestRestart)
                 {
@@ -297,9 +301,17 @@ namespace LevelGenerator
 
         private void RecalculateButton_Click(object sender, EventArgs e)
         {
-            RecalculateButton.Enabled = false;
-            RecalculateButton.Update();
-            RecalculateBackgroundWorker.RunWorkerAsync();
+            if (RecalculateBackgroundWorker.IsBusy)
+            {
+                DifficultyEvaluationCancelRequested = true;
+            }
+            else
+            {
+                DifficultyEvaluationCancelRequested = false;
+                RecalculateButton.Text = "Cancel";
+                RecalculateButton.Update();
+                RecalculateBackgroundWorker.RunWorkerAsync();
+            }
         }
 
         private void ControlledBodyXPositionUpDown_ValueChanged(object sender, EventArgs e)
@@ -398,9 +410,13 @@ namespace LevelGenerator
 
         private void RecalculateBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            _bestDifficulty = DifficultyEvaluator.EvaluateDifficulty(_bestLevel, _screenBounds, 1, out _bestInterestingness, out _bestTryDictionary, UpdatePicture);
+            _bestDifficulty = DifficultyEvaluator.EvaluateDifficulty(_bestLevel, _screenBounds, 3, out _bestInterestingness, out _bestTryDictionary, UpdatePicture);
             UpdatePicture();
-            RecalculateButton.Enabled = true;
+        }
+
+        private void RecalculateBackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            RecalculateButton.Text = "Recalculate";
         }
     }
 }

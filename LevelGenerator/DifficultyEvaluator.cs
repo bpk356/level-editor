@@ -8,7 +8,7 @@ namespace LevelGenerator
     class DifficultyEvaluator
     {
         static public double EvaluateDifficulty(Level level, Rect screenBounds, int resolution, out double interestingness, out Dictionary<Vector2, bool> tryDictionary,
-            Action updatePictureFunc)
+            Func<bool> updatePictureFunc)
         {
             Random generator = new Random();
             int winCount = 0;
@@ -37,26 +37,32 @@ namespace LevelGenerator
             //    .AsParallel()
             //    .ForAll(xOffset =>
             List<Tuple<int, int>> outerValues = new List<Tuple<int, int>>();
-            for (int outerX = 0; outerX < resolution * 8; outerX++)
+            for (int outerX = 40; outerX < screenBounds.Width - 40; outerX+= resolution)
             {
-                for (int outerY = 0; outerY < resolution * 8; outerY++)
+                for (int outerY = 40; outerY < screenBounds.Height - 40; outerY += resolution)
                 {
-                    outerValues.Add(new Tuple<int,int>(outerX, outerY));
+                    outerValues.Add(new Tuple<int, int>(outerX, outerY));
                 }
             }
-            while(outerValues.Count > 0)
+            while (outerValues.Count > 0)
             {
                 int outerIndex = generator.Next(outerValues.Count);
                 int outerX = outerValues[outerIndex].Item1;
                 int outerY = outerValues[outerIndex].Item2;
-                    for (int xOffset = 40 + outerX; xOffset < screenBounds.Width - 40; xOffset += resolution * 8)
-                    {
-                        //Console.WriteLine("Evaluting x = " + xOffset);
-                        for (int yOffset = 40 + outerY; yOffset < screenBounds.Height - 40; yOffset += resolution * 8)
-                        {
-                            EvaluateMousePosition(level, screenBounds, resolution, tryDictionary, updatePictureFunc, ref winCount, ref lossCount, ref offscreenWinCount, ref onscreenWinCount, ref minControlledBodyTravelDistanceOnWin, ref minTravelDistanceOnWin, ref wouldHaveWons, xOffset, yOffset);
-                        }
-                    }//);
+                //for (int xOffset = 40 + outerX; xOffset < screenBounds.Width - 40; xOffset += resolution * 8)
+                //{
+                //Console.WriteLine("Evaluting x = " + xOffset);
+                //for (int yOffset = 40 + outerY; yOffset < screenBounds.Height - 40; yOffset += resolution * 8)
+                //{
+                int xOffset = outerX;
+                int yOffset = outerY;
+                bool cancelRequested = EvaluateMousePosition(level, screenBounds, resolution, tryDictionary, updatePictureFunc, ref winCount, ref lossCount, ref offscreenWinCount, ref onscreenWinCount, ref minControlledBodyTravelDistanceOnWin, ref minTravelDistanceOnWin, ref wouldHaveWons, xOffset, yOffset);
+                if (cancelRequested)
+                {
+                    return 0.0;
+                }
+                //}
+                //}//);
                 outerValues.RemoveAt(outerIndex);
             }
             interestingness *= minTravelDistanceOnWin;
@@ -70,7 +76,7 @@ namespace LevelGenerator
             return (double)winCount / (winCount + lossCount);
         }
 
-        private static void EvaluateMousePosition(Level level, Rect screenBounds, int resolution, Dictionary<Vector2, bool> tryDictionary, Action updatePictureFunc, ref int winCount, ref int lossCount, ref int offscreenWinCount, ref int onscreenWinCount, ref float minControlledBodyTravelDistanceOnWin, ref float minTravelDistanceOnWin, ref int wouldHaveWons, int xOffset, int yOffset)
+        private static bool EvaluateMousePosition(Level level, Rect screenBounds, int resolution, Dictionary<Vector2, bool> tryDictionary, Func<bool> updatePictureFunc, ref int winCount, ref int lossCount, ref int offscreenWinCount, ref int onscreenWinCount, ref float minControlledBodyTravelDistanceOnWin, ref float minTravelDistanceOnWin, ref int wouldHaveWons, int xOffset, int yOffset)
         {
             Vector2 mousePosition = new Vector2(screenBounds.MinX + xOffset, screenBounds.MinY + yOffset);
             SimulationState simulationState = new SimulationState(level, mousePosition);
@@ -134,8 +140,12 @@ namespace LevelGenerator
             }
             if (willUpdate)
             {
-                updatePictureFunc();
+                if (updatePictureFunc())
+                {
+                    return true;
+                }
             }
+            return false;
         }
     }
 }

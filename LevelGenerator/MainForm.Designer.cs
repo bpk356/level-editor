@@ -283,6 +283,7 @@
             // RecalculateBackgroundWorker
             // 
             this.RecalculateBackgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.RecalculateBackgroundWorker_DoWork);
+            this.RecalculateBackgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.RecalculateBackgroundWorker_RunWorkerCompleted);
             // 
             // MainForm
             // 
