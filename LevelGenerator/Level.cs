@@ -11,7 +11,7 @@ namespace LevelGenerator
     {
         public List<SpaceBody> IndependentBodies { get; set; }
         public Circle GoalArea { get; set; }
-        public Circle AvoidArea { get; set; }
+        public List<Circle> AvoidAreas { get; set; }
         public SpaceBody ControlledBody { get; set; }
 
         public int MutatableAttributeCount
@@ -33,7 +33,10 @@ namespace LevelGenerator
                 yield return independentBody;
             }
             yield return GoalArea;
-            yield return AvoidArea;
+            foreach (var avoidArea in AvoidAreas)
+            {
+                yield return avoidArea;
+            }
             yield return ControlledBody;
         }
 
@@ -46,14 +49,18 @@ namespace LevelGenerator
             }
             ControlledBody = new SpaceBody(generator, bounds);
 
-            AvoidArea = GenerateRandomArea(generator, bounds);
-            GoalArea = GenerateRandomArea(generator, bounds);            
+            AvoidAreas = new List<Circle>();
+            AvoidAreas.Add(GenerateRandomArea(generator, bounds));
+            GoalArea = GenerateRandomArea(generator, bounds);
         }
 
         public void Draw(Rect screenBounds)
         {
             GoalArea.Draw(Color.FromArgb(128, Color.Green), screenBounds);
-            AvoidArea.Draw(Color.FromArgb(128, Color.Red), screenBounds);
+            foreach (var avoidArea in AvoidAreas)
+            {
+                avoidArea.Draw(Color.FromArgb(128, Color.Red), screenBounds);
+            }
             foreach (var independentBody in IndependentBodies)
             {
                 independentBody.Draw(Color.FromArgb(128, Color.Blue), true, screenBounds);
@@ -63,9 +70,12 @@ namespace LevelGenerator
 
         public bool EverythingVisible(Rect screenBounds)
         {
-            if (!AvoidArea.IsVisible(screenBounds))
+            foreach (var avoidArea in AvoidAreas)
             {
-                return false;
+                if (!avoidArea.IsVisible(screenBounds))
+                {
+                    return false;
+                }
             }
             if (!GoalArea.IsVisible(screenBounds))
             {
@@ -78,7 +88,10 @@ namespace LevelGenerator
         {
             Console.WriteLine("Controlled Body: " + ControlledBody.ToString());
             Console.WriteLine("Goal Area: " + GoalArea.ToString());
-            Console.WriteLine("Avoid Area: " + AvoidArea.ToString());
+            foreach (var avoidArea in AvoidAreas)
+            {
+                Console.WriteLine("Avoid Area: " + avoidArea.ToString());
+            }
             foreach (var independentBody in IndependentBodies)
             {
                 Console.WriteLine("Independent body: " + independentBody.ToString());

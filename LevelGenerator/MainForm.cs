@@ -118,51 +118,57 @@ namespace LevelGenerator
             location = AvoidAreaCountUpDown.Location;
             location.Y = currentY;
             AvoidAreaCountUpDown.Location = location;
-            AvoidAreaCountUpDown.Value = 1;//(decimal)_bestLevel.AvoidArea
+            AvoidAreaCountUpDown.Value = (decimal)_bestLevel.AvoidAreas.Count;
             currentY += 35;
 
-            Label positionLabel = new Label();
-            positionLabel.Text = "Position";
-            positionLabel.AutoSize = true;
-            positionLabel.Location = new System.Drawing.Point(10, currentY);
-            positionLabel.Size = new System.Drawing.Size(102, 13);
-            Controls.Add(positionLabel);
-            _generatedControls.Add(positionLabel);
+            int avoidAreaIndex = 0;
+            foreach (var avoidArea in _bestLevel.AvoidAreas)
+            {
 
-            NumericUpDown xPosition = new NumericUpDown();
-            xPosition.Minimum = (decimal)_screenBounds.MinX;
-            xPosition.Maximum = (decimal)_screenBounds.MaxX;
-            xPosition.Size = new System.Drawing.Size(60, 20);
-            xPosition.Location = new System.Drawing.Point(80, currentY - 3);
-            xPosition.Name = "0,x";
-            xPosition.ValueChanged += AvoidArea_ValueChanged;
-            xPosition.Value = (decimal)_bestLevel.AvoidArea.CenterPoint.X;
-            Controls.Add(xPosition);
-            _generatedControls.Add(xPosition);
+                Label positionLabel = new Label();
+                positionLabel.Text = "Position";
+                positionLabel.AutoSize = true;
+                positionLabel.Location = new System.Drawing.Point(10, currentY);
+                positionLabel.Size = new System.Drawing.Size(102, 13);
+                Controls.Add(positionLabel);
+                _generatedControls.Add(positionLabel);
 
-            NumericUpDown yPosition = new NumericUpDown();
-            yPosition.Minimum = (decimal)_screenBounds.MinY;
-            yPosition.Maximum = (decimal)_screenBounds.MaxY;
-            yPosition.Size = new System.Drawing.Size(60, 20);
-            yPosition.Location = new System.Drawing.Point(145, currentY - 3);
-            yPosition.Name = "0,y";
-            yPosition.ValueChanged += AvoidArea_ValueChanged;
-            yPosition.Value = (decimal)_bestLevel.AvoidArea.CenterPoint.Y;
-            Controls.Add(yPosition);
-            _generatedControls.Add(yPosition);
+                NumericUpDown xPosition = new NumericUpDown();
+                xPosition.Minimum = (decimal)_screenBounds.MinX;
+                xPosition.Maximum = (decimal)_screenBounds.MaxX;
+                xPosition.Size = new System.Drawing.Size(60, 20);
+                xPosition.Location = new System.Drawing.Point(80, currentY - 3);
+                xPosition.Name = avoidAreaIndex + ",x";
+                xPosition.ValueChanged += AvoidArea_ValueChanged;
+                xPosition.Value = (decimal)avoidArea.CenterPoint.X;
+                Controls.Add(xPosition);
+                _generatedControls.Add(xPosition);
 
-            NumericUpDown radius = new NumericUpDown();
-            radius.Minimum = (decimal)1;
-            radius.Maximum = (decimal)1000;
-            radius.Size = new System.Drawing.Size(60, 20);
-            radius.Location = new System.Drawing.Point(210, currentY - 3);
-            radius.Name = "0,radius";
-            radius.ValueChanged += AvoidArea_ValueChanged;
-            radius.Value = (decimal)_bestLevel.AvoidArea.Radius;
-            Controls.Add(radius);
-            _generatedControls.Add(radius);
+                NumericUpDown yPosition = new NumericUpDown();
+                yPosition.Minimum = (decimal)_screenBounds.MinY;
+                yPosition.Maximum = (decimal)_screenBounds.MaxY;
+                yPosition.Size = new System.Drawing.Size(60, 20);
+                yPosition.Location = new System.Drawing.Point(145, currentY - 3);
+                yPosition.Name = avoidAreaIndex + ",y";
+                yPosition.ValueChanged += AvoidArea_ValueChanged;
+                yPosition.Value = (decimal)avoidArea.CenterPoint.Y;
+                Controls.Add(yPosition);
+                _generatedControls.Add(yPosition);
 
-            currentY += 35;
+                NumericUpDown radius = new NumericUpDown();
+                radius.Minimum = (decimal)1;
+                radius.Maximum = (decimal)1000;
+                radius.Size = new System.Drawing.Size(60, 20);
+                radius.Location = new System.Drawing.Point(210, currentY - 3);
+                radius.Name = avoidAreaIndex + ",radius";
+                radius.ValueChanged += AvoidArea_ValueChanged;
+                radius.Value = (decimal)avoidArea.Radius;
+                Controls.Add(radius);
+                _generatedControls.Add(radius);
+
+                currentY += 35;
+                avoidAreaIndex++;
+            }
         }
 
         private int UpdateIndependentBodyControls(int currentY)
@@ -292,7 +298,7 @@ namespace LevelGenerator
         private void BeginSimulating(int x, int y)
         {
             SimulationTimer.Stop();
-            _simulationState = new SimulationState(_bestLevel, GLControlMousePositionToWorldCoordinates(x,y));
+            _simulationState = new SimulationState(_bestLevel, GLControlMousePositionToWorldCoordinates(x, y));
             SimulationTimer.Start();
         }
 
@@ -405,15 +411,15 @@ namespace LevelGenerator
 
             if (axis == "x")
             {
-                _bestLevel.AvoidArea.CenterPoint.X = (float)upDownSender.Value;
+                _bestLevel.AvoidAreas[index].CenterPoint.X = (float)upDownSender.Value;
             }
             else if (axis == "y")
             {
-                _bestLevel.AvoidArea.CenterPoint.Y = (float)upDownSender.Value;
+                _bestLevel.AvoidAreas[index].CenterPoint.Y = (float)upDownSender.Value;
             }
             else if (axis == "radius")
             {
-                _bestLevel.AvoidArea.Radius = (int)upDownSender.Value;
+                _bestLevel.AvoidAreas[index].Radius = (int)upDownSender.Value;
             }
             UpdatePicture();
         }
@@ -474,6 +480,20 @@ namespace LevelGenerator
         private void DisplayGLControl_MouseUp(object sender, MouseEventArgs e)
         {
             _draggingObject = null;
+        }
+
+        private void AvoidAreaCountUpDown_ValueChanged(object sender, EventArgs e)
+        {
+            int newAvoidAreaCount = (int)AvoidAreaCountUpDown.Value;
+            while (_bestLevel.AvoidAreas.Count > newAvoidAreaCount)
+            {
+                _bestLevel.AvoidAreas.RemoveAt(_bestLevel.IndependentBodies.Count - 1);
+            }
+            while (_bestLevel.AvoidAreas.Count < newAvoidAreaCount)
+            {
+                _bestLevel.AvoidAreas.Add(new Circle(new Vector2(0, 0), 100));
+            }
+            UpdateControls();
         }
     }
 }

@@ -282,6 +282,7 @@
             this.AvoidAreaCountUpDown.Name = "AvoidAreaCountUpDown";
             this.AvoidAreaCountUpDown.Size = new System.Drawing.Size(60, 20);
             this.AvoidAreaCountUpDown.TabIndex = 25;
+            this.AvoidAreaCountUpDown.ValueChanged += new System.EventHandler(this.AvoidAreaCountUpDown_ValueChanged);
             // 
             // RecalculateBackgroundWorker
             // 

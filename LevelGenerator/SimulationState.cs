@@ -13,7 +13,7 @@ namespace LevelGenerator
         public const float FrameDeltaTime = 1.0f / SimulationFramesPerSecond;
         public List<SpaceBody> IndependentBodies { get; set; }
         public Circle GoalArea { get; set; }
-        public Circle AvoidArea { get; set; }
+        public List<Circle> AvoidAreas { get; set; }
         public SpaceBody ControlledBody { get; set; }
 
         public SimulationState(Level level, Vector2 mousePosition)
@@ -25,7 +25,11 @@ namespace LevelGenerator
             }
             ControlledBody = new SpaceBody(level.ControlledBody);
             GoalArea = level.GoalArea;
-            AvoidArea = level.AvoidArea;
+            AvoidAreas = new List<Circle>();
+            foreach (var avoidArea in level.AvoidAreas)
+            {
+                AvoidAreas.Add(new Circle(avoidArea));
+            }
             ControlledBody.Velocity = (mousePosition - ControlledBody.Position) / 2.0f;
         }
 
@@ -40,7 +44,7 @@ namespace LevelGenerator
 
         public bool EverythingVisible(Rect screenBounds)
         {
-            if (!AvoidArea.IsVisible(screenBounds))
+            if (!AvoidAreas.All(avoidArea => avoidArea.IsVisible(screenBounds)))
             {
                 return false;
             }
@@ -101,9 +105,15 @@ namespace LevelGenerator
                     return true;
                 }
 
-                if (checkAvoidArea && (ControlledBody.Position - AvoidArea.CenterPoint).Magnitude() < AvoidArea.Radius + ControlledBody.Radius / 2.0f)
+                if (checkAvoidArea)
                 {
-                    return false;
+                    foreach (var avoidArea in AvoidAreas)
+                    {
+                        if ((ControlledBody.Position - avoidArea.CenterPoint).Magnitude() < avoidArea.Radius + ControlledBody.Radius / 2.0f)
+                        {
+                            return false;
+                        }
+                    }
                 }
 
                 if (ControlledBody.Position.Magnitude() > screenBounds.Width)
