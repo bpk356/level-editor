@@ -72,9 +72,9 @@ namespace LevelGenerator
         {
             foreach (var independentBody in IndependentBodies)
             {
-                independentBody.Draw(Color.FromArgb(50, Color.Blue), true, screenBounds);
+                independentBody.Draw(Color.FromArgb(128, Color.Blue), true, screenBounds);
             }
-            ControlledBody.Draw(Color.FromArgb(50, Color.SkyBlue), false, screenBounds);
+            ControlledBody.Draw(Color.FromArgb(128, Color.SkyBlue), false, screenBounds);
         }
 
         public bool Simulate(bool checkAvoidArea, Rect screenBounds, int maxFrameCount, out bool hadOffscreen, out float totalControlledBodyTravelDistance, out Vector2 winPosition)

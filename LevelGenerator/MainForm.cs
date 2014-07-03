@@ -25,6 +25,8 @@ namespace LevelGenerator
         bool DifficultyEvaluationCancelRequested;
         IDraggableObject _draggingObject;
         Vector2 _draggingOffset;
+        List<SpaceBody> _controlledBodyStates;
+        bool _showTrajectoryOnMouseMove;
 
         public MainForm()
         {
@@ -269,6 +271,14 @@ namespace LevelGenerator
                     _simulationState.Draw(_screenBounds);
                 }
 
+                if (_controlledBodyStates != null)
+                {
+                    foreach (var controlledBodyState in _controlledBodyStates)
+                    {
+                        controlledBodyState.Draw(Color.FromArgb(50, Color.SkyBlue), false, _screenBounds);
+                    }
+                }
+
                 DifficultyLabel.Text = "Difficulty: " + _bestDifficulty + ", Interestingness: " + _bestInterestingness;
             }
 
@@ -287,6 +297,27 @@ namespace LevelGenerator
                 {
                     BeginSimulating(e.X, e.Y);
                 }
+            }
+            if (e.Button == System.Windows.Forms.MouseButtons.Middle)
+            {
+                _showTrajectoryOnMouseMove = !_showTrajectoryOnMouseMove;
+                /*
+                if (_controlledBodyStates == null)
+                {
+                    _simulationState = new SimulationState(_bestLevel, GLControlMousePositionToWorldCoordinates(e.X, e.Y));
+                    List<SpaceBody> controlledBodyStates = new List<SpaceBody>();
+                    for (int i = 0; i < SimulationState.SimulationFramesPerSecond * 15; i++)
+                    {
+                        controlledBodyStates.Add(new SpaceBody(_simulationState.ControlledBody));
+                        _simulationState.MoveBodies();
+                    }
+                    _controlledBodyStates = controlledBodyStates;
+                }
+                else
+                {
+                    _controlledBodyStates = null;
+                }
+                UpdatePicture();*/
             }
         }
 
@@ -465,16 +496,27 @@ namespace LevelGenerator
 
         private void DisplayGLControl_MouseMove(object sender, MouseEventArgs e)
         {
-            if (_draggingObject == null)
+            if (_draggingObject != null)
             {
-                return;
+                Vector2 mousePosition = GLControlMousePositionToWorldCoordinates(e.X, e.Y);
+                Vector2 newObjectPosition = mousePosition + _draggingOffset;
+                _draggingObject.UpdatePosition(newObjectPosition);
+                UpdateControls();
+                UpdatePicture();
+                DisplayGLControl.Update();
             }
-            Vector2 mousePosition = GLControlMousePositionToWorldCoordinates(e.X, e.Y);
-            Vector2 newObjectPosition = mousePosition + _draggingOffset;
-            _draggingObject.UpdatePosition(newObjectPosition);
-            UpdateControls();
-            UpdatePicture();
-            DisplayGLControl.Update();
+            else if(_showTrajectoryOnMouseMove)
+            {
+                SimulationState simulationState = new SimulationState(_bestLevel, GLControlMousePositionToWorldCoordinates(e.X, e.Y));
+                List<SpaceBody> controlledBodyStates = new List<SpaceBody>();
+                for (int i = 0; i < SimulationState.SimulationFramesPerSecond * 15; i++)
+                {
+                    controlledBodyStates.Add(new SpaceBody(simulationState.ControlledBody));
+                    simulationState.MoveBodies();
+                }
+                _controlledBodyStates = controlledBodyStates;
+                UpdatePicture();
+            }
         }
 
         private void DisplayGLControl_MouseUp(object sender, MouseEventArgs e)
