@@ -219,6 +219,15 @@ namespace LevelGenerator
                 Controls.Add(mass);
                 _generatedControls.Add(mass);
 
+                CheckBox isStationary = new CheckBox();
+                isStationary.Text = "Is Stationary";
+                isStationary.Checked = independentBody.IsStationary;
+                isStationary.Location = new System.Drawing.Point(275, currentY - 3);
+                isStationary.Name = independentBodyI + ",stationary";
+                isStationary.CheckedChanged += IndependentBodyIsStationaryCheckBox_CheckedChanged;
+                Controls.Add(isStationary);
+                _generatedControls.Add(isStationary);
+
                 independentBodyI++;
                 currentY += 35;
             }
@@ -394,6 +403,16 @@ namespace LevelGenerator
         private void GoalAreaRadiusUpDown_ValueChanged(object sender, EventArgs e)
         {
             _bestLevel.GoalArea.Radius = (float)GoalAreaRadiusUpDown.Value;
+            UpdatePicture();
+        }
+
+        private void IndependentBodyIsStationaryCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            CheckBox checkBoxSender = (CheckBox)sender;
+            string[] parts = checkBoxSender.Name.Split(',');
+            int index = int.Parse(parts[0]);
+
+            _bestLevel.IndependentBodies[index].IsStationary = checkBoxSender.Checked;
             UpdatePicture();
         }
 

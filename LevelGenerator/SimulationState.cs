@@ -72,7 +72,7 @@ namespace LevelGenerator
         {
             foreach (var independentBody in IndependentBodies)
             {
-                independentBody.Draw(Color.FromArgb(128, Color.Blue), true, screenBounds);
+                independentBody.Draw(Color.FromArgb(128, independentBody.IsStationary ? Color.Purple : Color.Blue), true, screenBounds);
             }
             ControlledBody.Draw(Color.FromArgb(128, Color.SkyBlue), false, screenBounds);
         }

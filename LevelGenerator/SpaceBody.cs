@@ -15,6 +15,7 @@ namespace LevelGenerator
         public Vector2 Velocity { get; set; }
         public int Radius { get; set; }
         public float Mass { get { return (float)Math.Pow(10, Radius / 4); } }
+        public bool IsStationary { get; set; }
 
         public const int MutatableAttributeCount = Vector2.MutatableAttributeCount * 2 + 2;
 
@@ -27,6 +28,7 @@ namespace LevelGenerator
                 Velocity = new Vector2((float)generator.NextDouble() * bounds.Width + bounds.MinX, (float)generator.NextDouble() * bounds.Height + bounds.MinY);
             } while (VelocityWillGoOffscreen(bounds));
             Velocity = new Vector2(0, 0);
+            IsStationary = false;
         }
 
         public SpaceBody(Vector2 position, Vector2 velocity, int radius)
@@ -81,13 +83,16 @@ namespace LevelGenerator
                     return true;
                 }
             }
-            if (bodyCount > 0)
+            if (!IsStationary)
             {
-                Vector2 averageForce = totalForce / bodyCount;
-                Vector2 acceleration = averageForce / Mass;
-                Velocity += acceleration * deltaTime;
+                if (bodyCount > 0)
+                {
+                    Vector2 averageForce = totalForce / bodyCount;
+                    Vector2 acceleration = averageForce / Mass;
+                    Velocity += acceleration * deltaTime;
+                }
+                Position += Velocity * deltaTime;
             }
-            Position += Velocity * deltaTime;
             return false;
         }
 
@@ -96,6 +101,7 @@ namespace LevelGenerator
             Position = new Vector2(other.Position);
             Velocity = new Vector2(other.Velocity);
             Radius = other.Radius;
+            IsStationary = other.IsStationary;
         }
 
         bool VelocityWillGoOffscreen(Rect bounds)
