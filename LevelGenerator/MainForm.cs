@@ -27,6 +27,7 @@ namespace LevelGenerator
         Vector2 _draggingOffset;
         List<SpaceBody> _controlledBodyStates;
         bool _showTrajectoryOnMouseMove;
+        int _resolution;
 
         public MainForm()
         {
@@ -38,6 +39,7 @@ namespace LevelGenerator
             _bestLevel = new Level(1, _generator, _screenBounds);
             UpdateControls();
             DifficultyEvaluationCancelRequested = false;
+            _resolution = 4;
         }
 
         private bool UpdatePicture()
@@ -61,7 +63,7 @@ namespace LevelGenerator
                 Level newLevel = new Level(1, _generator, _screenBounds);
                 double newInterestingness;
                 Dictionary<Vector2, bool> tryDictionary;
-                double newDifficulty = DifficultyEvaluator.EvaluateDifficulty(newLevel, _screenBounds, 2, out newInterestingness, out tryDictionary, UpdatePicture);
+                double newDifficulty = DifficultyEvaluator.EvaluateDifficulty(newLevel, _screenBounds, _resolution, out newInterestingness, out tryDictionary, UpdatePicture);
 
                 if (newDifficulty > .0001 && newInterestingness > _bestInterestingness || RequestRestart)
                 {
@@ -268,7 +270,7 @@ namespace LevelGenerator
                     {
                         foreach (var kvp in _bestTryDictionary)
                         {
-                            DrawHelper.SetPixel(kvp.Key, kvp.Value ? Color.White : Color.Red, _screenBounds);
+                            DrawHelper.SetPixel(kvp.Key, Color.FromArgb(50, kvp.Value ? Color.White : Color.Red), _screenBounds, _resolution);
                         }
                     }
                 }
@@ -309,7 +311,19 @@ namespace LevelGenerator
             }
             if (e.Button == System.Windows.Forms.MouseButtons.Middle)
             {
-                _showTrajectoryOnMouseMove = !_showTrajectoryOnMouseMove;
+                if (_showTrajectoryOnMouseMove)
+                {
+                    _showTrajectoryOnMouseMove = false;
+                }
+                else if (!_showTrajectoryOnMouseMove && _controlledBodyStates != null)
+                {
+                    _controlledBodyStates = null;
+                    UpdatePicture();
+                }
+                else
+                {
+                    _showTrajectoryOnMouseMove = true;
+                }
                 /*
                 if (_controlledBodyStates == null)
                 {
@@ -476,7 +490,7 @@ namespace LevelGenerator
 
         private void RecalculateBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            _bestDifficulty = DifficultyEvaluator.EvaluateDifficulty(_bestLevel, _screenBounds, 3, out _bestInterestingness, out _bestTryDictionary, UpdatePicture);
+            _bestDifficulty = DifficultyEvaluator.EvaluateDifficulty(_bestLevel, _screenBounds, _resolution, out _bestInterestingness, out _bestTryDictionary, UpdatePicture);
             UpdatePicture();
         }
 
@@ -555,6 +569,11 @@ namespace LevelGenerator
                 _bestLevel.AvoidAreas.Add(new Circle(new Vector2(0, 0), 100));
             }
             UpdateControls();
+        }
+
+        private void ResolutionUpDown_ValueChanged(object sender, EventArgs e)
+        {
+            _resolution = (int)ResolutionUpDown.Value;
         }
     }
 }

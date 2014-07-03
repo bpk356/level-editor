@@ -48,6 +48,7 @@
             this.AvoidAreasLabel = new System.Windows.Forms.Label();
             this.AvoidAreaCountUpDown = new System.Windows.Forms.NumericUpDown();
             this.RecalculateBackgroundWorker = new System.ComponentModel.BackgroundWorker();
+            this.ResolutionUpDown = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.ControlledBodyXPositionUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ControlledBodyYPositionUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ControlledBodyMassUpDown)).BeginInit();
@@ -56,12 +57,13 @@
             ((System.ComponentModel.ISupportInitialize)(this.GoalAreaYPositionUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.IndependentBodyCountUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.AvoidAreaCountUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ResolutionUpDown)).BeginInit();
             this.SuspendLayout();
             // 
             // DifficultyLabel
             // 
             this.DifficultyLabel.AutoSize = true;
-            this.DifficultyLabel.Location = new System.Drawing.Point(94, 13);
+            this.DifficultyLabel.Location = new System.Drawing.Point(146, 13);
             this.DifficultyLabel.Name = "DifficultyLabel";
             this.DifficultyLabel.Size = new System.Drawing.Size(77, 13);
             this.DifficultyLabel.TabIndex = 2;
@@ -289,11 +291,30 @@
             this.RecalculateBackgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.RecalculateBackgroundWorker_DoWork);
             this.RecalculateBackgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.RecalculateBackgroundWorker_RunWorkerCompleted);
             // 
+            // ResolutionUpDown
+            // 
+            this.ResolutionUpDown.Location = new System.Drawing.Point(94, 10);
+            this.ResolutionUpDown.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.ResolutionUpDown.Name = "ResolutionUpDown";
+            this.ResolutionUpDown.Size = new System.Drawing.Size(46, 20);
+            this.ResolutionUpDown.TabIndex = 26;
+            this.ResolutionUpDown.Value = new decimal(new int[] {
+            4,
+            0,
+            0,
+            0});
+            this.ResolutionUpDown.ValueChanged += new System.EventHandler(this.ResolutionUpDown_ValueChanged);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1360, 758);
+            this.Controls.Add(this.ResolutionUpDown);
             this.Controls.Add(this.AvoidAreaCountUpDown);
             this.Controls.Add(this.AvoidAreasLabel);
             this.Controls.Add(this.IndependentBodyCountUpDown);
@@ -322,6 +343,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.GoalAreaYPositionUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.IndependentBodyCountUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.AvoidAreaCountUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ResolutionUpDown)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -348,6 +370,7 @@
         private System.Windows.Forms.Label AvoidAreasLabel;
         private System.Windows.Forms.NumericUpDown AvoidAreaCountUpDown;
         private System.ComponentModel.BackgroundWorker RecalculateBackgroundWorker;
+        private System.Windows.Forms.NumericUpDown ResolutionUpDown;
     }
 }
 

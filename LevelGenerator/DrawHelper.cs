@@ -48,7 +48,7 @@ namespace LevelGenerator
             GL.End();
         }
 
-        public static void SetPixel(Vector2 position, Color color, Rect screenBounds)
+        public static void SetPixel(Vector2 position, Color color, Rect screenBounds, int size)
         {
             Vector2 scaledPosition = new Vector2(position);
             scaledPosition.X -= screenBounds.MinX;
@@ -56,12 +56,12 @@ namespace LevelGenerator
 
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadIdentity();
-            GL.Color3(color);
+            GL.Color4(color);
             GL.Begin(PrimitiveType.TriangleFan);
             GL.Vertex2(scaledPosition.X, scaledPosition.Y);
-            GL.Vertex2(scaledPosition.X, scaledPosition.Y + 1);
-            GL.Vertex2(scaledPosition.X + 1, scaledPosition.Y + 1);
-            GL.Vertex2(scaledPosition.X + 1, scaledPosition.Y);
+            GL.Vertex2(scaledPosition.X, scaledPosition.Y + size);
+            GL.Vertex2(scaledPosition.X + size, scaledPosition.Y + size);
+            GL.Vertex2(scaledPosition.X + size, scaledPosition.Y);
             GL.End();
         }
     }

@@ -94,7 +94,7 @@ namespace LevelGenerator
                     hadOffscreen = true;
                 }
                 totalControlledBodyTravelDistance += ControlledBody.Velocity.Magnitude() * FrameDeltaTime;
-                if (ControlledBody.Velocity.Magnitude() > screenBounds.Height / 2)
+                if (ControlledBody.Velocity.Magnitude() * FrameDeltaTime > 30)
                 {
                     return false;
                 }
