@@ -487,7 +487,7 @@ namespace LevelGenerator
             int newAvoidAreaCount = (int)AvoidAreaCountUpDown.Value;
             while (_bestLevel.AvoidAreas.Count > newAvoidAreaCount)
             {
-                _bestLevel.AvoidAreas.RemoveAt(_bestLevel.IndependentBodies.Count - 1);
+                _bestLevel.AvoidAreas.RemoveAt(_bestLevel.AvoidAreas.Count - 1);
             }
             while (_bestLevel.AvoidAreas.Count < newAvoidAreaCount)
             {
