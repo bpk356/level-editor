@@ -19,7 +19,6 @@ namespace LevelGenerator
         double _bestInterestingness;
         Dictionary<Vector2, bool> _bestTryDictionary;
         bool GLLoaded;
-        bool RequestRestart;
         SimulationState _simulationState;
         List<Control> _generatedControls;
         bool DifficultyEvaluationCancelRequested;
@@ -34,7 +33,6 @@ namespace LevelGenerator
             GLLoaded = false;
             InitializeComponent();
             _generator = new Random();
-            RequestRestart = false;
             _screenBounds = new Rect(-960 / 2, -640 / 2, 960 / 2, 640 / 2);
             _bestLevel = new Level(1, _generator, _screenBounds);
             UpdateControls();
@@ -56,29 +54,6 @@ namespace LevelGenerator
             return DifficultyEvaluationCancelRequested;
         }
 
-        private void TunerBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            while (true)
-            {
-                Level newLevel = new Level(1, _generator, _screenBounds);
-                double newInterestingness;
-                Dictionary<Vector2, bool> tryDictionary;
-                double newDifficulty = DifficultyEvaluator.EvaluateDifficulty(newLevel, _screenBounds, _resolution, out newInterestingness, out tryDictionary, UpdatePicture);
-
-                if (newDifficulty > .0001 && newInterestingness > _bestInterestingness || RequestRestart)
-                {
-                    _bestLevel = newLevel;
-                    _bestDifficulty = newDifficulty;
-                    _bestInterestingness = newInterestingness;
-                    _bestTryDictionary = tryDictionary;
-                    UpdatePicture();
-                    UpdateControls();
-                    RequestRestart = false;
-                    break;
-                }
-            }
-        }
-
         private void UpdateControls()
         {
             if (ControlledBodyXPositionUpDown.InvokeRequired)
@@ -91,8 +66,8 @@ namespace LevelGenerator
                 ControlledBodyYPositionUpDown.Value = (decimal)_bestLevel.ControlledBody.Position.Y;
                 ControlledBodyMassUpDown.Value = (decimal)_bestLevel.ControlledBody.Radius;
 
-                GoalAreaXPositionUpDown.Value = (decimal)_bestLevel.GoalArea.CenterPoint.X;
-                GoalAreaYPositionUpDown.Value = (decimal)_bestLevel.GoalArea.CenterPoint.Y;
+                GoalAreaXPositionUpDown.Value = (decimal)_bestLevel.GoalArea.Position.X;
+                GoalAreaYPositionUpDown.Value = (decimal)_bestLevel.GoalArea.Position.Y;
                 GoalAreaRadiusUpDown.Value = (decimal)_bestLevel.GoalArea.Radius;
 
                 IndependentBodyCountUpDown.Value = (decimal)_bestLevel.IndependentBodies.Count;
@@ -144,7 +119,7 @@ namespace LevelGenerator
                 xPosition.Location = new System.Drawing.Point(80, currentY - 3);
                 xPosition.Name = avoidAreaIndex + ",x";
                 xPosition.ValueChanged += AvoidArea_ValueChanged;
-                xPosition.Value = (decimal)avoidArea.CenterPoint.X;
+                xPosition.Value = (decimal)avoidArea.Position.X;
                 Controls.Add(xPosition);
                 _generatedControls.Add(xPosition);
 
@@ -155,7 +130,7 @@ namespace LevelGenerator
                 yPosition.Location = new System.Drawing.Point(145, currentY - 3);
                 yPosition.Name = avoidAreaIndex + ",y";
                 yPosition.ValueChanged += AvoidArea_ValueChanged;
-                yPosition.Value = (decimal)avoidArea.CenterPoint.Y;
+                yPosition.Value = (decimal)avoidArea.Position.Y;
                 Controls.Add(yPosition);
                 _generatedControls.Add(yPosition);
 
@@ -404,13 +379,13 @@ namespace LevelGenerator
 
         private void GoalAreaXPositionUpDown_ValueChanged(object sender, EventArgs e)
         {
-            _bestLevel.GoalArea.CenterPoint.X = (float)GoalAreaXPositionUpDown.Value;
+            _bestLevel.GoalArea.Position.X = (float)GoalAreaXPositionUpDown.Value;
             UpdatePicture();
         }
 
         private void GoalAreaYPositionUpDown_ValueChanged(object sender, EventArgs e)
         {
-            _bestLevel.GoalArea.CenterPoint.Y = (float)GoalAreaYPositionUpDown.Value;
+            _bestLevel.GoalArea.Position.Y = (float)GoalAreaYPositionUpDown.Value;
             UpdatePicture();
         }
 
@@ -475,11 +450,11 @@ namespace LevelGenerator
 
             if (axis == "x")
             {
-                _bestLevel.AvoidAreas[index].CenterPoint.X = (float)upDownSender.Value;
+                _bestLevel.AvoidAreas[index].Position.X = (float)upDownSender.Value;
             }
             else if (axis == "y")
             {
-                _bestLevel.AvoidAreas[index].CenterPoint.Y = (float)upDownSender.Value;
+                _bestLevel.AvoidAreas[index].Position.Y = (float)upDownSender.Value;
             }
             else if (axis == "radius")
             {
@@ -574,6 +549,24 @@ namespace LevelGenerator
         private void ResolutionUpDown_ValueChanged(object sender, EventArgs e)
         {
             _resolution = (int)ResolutionUpDown.Value;
+        }
+
+        private void SaveButton_Click(object sender, EventArgs e)
+        {
+            if (SaveLevelFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                _bestLevel.Save(SaveLevelFileDialog.FileName);
+            }
+        }
+
+        private void LoadButton_Click(object sender, EventArgs e)
+        {
+            if (OpenLevelFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                _bestLevel = new Level(OpenLevelFileDialog.FileName);
+                UpdatePicture();
+                UpdateControls();
+            }
         }
     }
 }

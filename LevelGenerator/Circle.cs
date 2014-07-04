@@ -9,38 +9,47 @@ namespace LevelGenerator
 {
     class Circle : IDraggableObject
     {
-        public Vector2 CenterPoint { get; set; }
+        public Vector2 Position { get; set; }
         public float Radius { get; set; }
 
         public const int MutatableAttributeCount = Vector2.MutatableAttributeCount + 2;
 
         public Circle(Vector2 centerPoint, float radius)
         {
-            CenterPoint = centerPoint;
+            Position = centerPoint;
             Radius = radius;
         }
 
         public Circle(Circle other)
         {
-            CenterPoint = new Vector2(other.CenterPoint);
+            Position = new Vector2(other.Position);
             Radius = other.Radius;
+        }
+
+        public Circle(string description)
+        {
+            string[] parts = description.Split(',');
+            float positionX = float.Parse(parts[0]);
+            float positionY = float.Parse(parts[1]);
+            Position = new Vector2(positionX, positionY);
+            Radius = float.Parse(parts[2]);
         }
 
         public bool IsVisible(Rect screenBounds)
         {
-            if (!screenBounds.ContainsPoint(CenterPoint + Vector2.Left * Radius))
+            if (!screenBounds.ContainsPoint(Position + Vector2.Left * Radius))
             {
                 return false;
             }
-            if (!screenBounds.ContainsPoint(CenterPoint + Vector2.Right * Radius))
+            if (!screenBounds.ContainsPoint(Position + Vector2.Right * Radius))
             {
                 return false;
             }
-            if (!screenBounds.ContainsPoint(CenterPoint + Vector2.Up * Radius))
+            if (!screenBounds.ContainsPoint(Position + Vector2.Up * Radius))
             {
                 return false;
             }
-            if (!screenBounds.ContainsPoint(CenterPoint + Vector2.Down * Radius))
+            if (!screenBounds.ContainsPoint(Position + Vector2.Down * Radius))
             {
                 return false;
             }
@@ -61,18 +70,23 @@ namespace LevelGenerator
             }
             else
             {
-                CenterPoint.MutateAttribute(targetAttribute);
+                Position.MutateAttribute(targetAttribute);
             }
+        }
+
+        public static string StringDescription()
+        {
+            return "#PositionX,PositionY,Radius";
         }
 
         public override string ToString()
         {
-            return "Center: " + CenterPoint.ToString() + ", Radius: " + Radius;
+            return Position.ToString() + "," + Radius;
         }
 
         public void Draw(Color color, Rect screenBounds)
         {
-            DrawHelper.DrawCircle(CenterPoint, Radius, color, screenBounds);
+            DrawHelper.DrawCircle(Position, Radius, color, screenBounds);
         }
 
         #region IDraggableObject Members
@@ -89,12 +103,12 @@ namespace LevelGenerator
 
         public Vector2 OffsetFromMouse(Vector2 mousePosition)
         {
-            return CenterPoint - mousePosition;
+            return Position - mousePosition;
         }
 
         public void UpdatePosition(Vector2 newPosition)
         {
-            CenterPoint = new Vector2(newPosition);
+            Position = new Vector2(newPosition);
         }
 
         #endregion

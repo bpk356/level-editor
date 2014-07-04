@@ -99,7 +99,7 @@ namespace LevelGenerator
                     return false;
                 }
 
-                if ((ControlledBody.Position - GoalArea.CenterPoint).Magnitude() < GoalArea.Radius - ControlledBody.Radius / 2.0f)
+                if ((ControlledBody.Position - GoalArea.Position).Magnitude() < GoalArea.Radius - ControlledBody.Radius / 2.0f)
                 {
                     winPosition = new Vector2(ControlledBody.Position);
                     return true;
@@ -109,7 +109,7 @@ namespace LevelGenerator
                 {
                     foreach (var avoidArea in AvoidAreas)
                     {
-                        if ((ControlledBody.Position - avoidArea.CenterPoint).Magnitude() < avoidArea.Radius + ControlledBody.Radius / 2.0f)
+                        if ((ControlledBody.Position - avoidArea.Position).Magnitude() < avoidArea.Radius + ControlledBody.Radius / 2.0f)
                         {
                             return false;
                         }

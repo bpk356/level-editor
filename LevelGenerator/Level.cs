@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.IO;
 
 namespace LevelGenerator
 {
@@ -54,6 +55,43 @@ namespace LevelGenerator
             GoalArea = GenerateRandomArea(generator, bounds);
         }
 
+        public Level(string filename)
+        {
+            IEnumerable<string> usefulLines = File.ReadLines(filename).Where(line => line.Length > 0 && !line.StartsWith("#"));
+            IEnumerator<string> enumer = usefulLines.GetEnumerator();
+            enumer.MoveNext();
+
+            if (int.Parse(enumer.Current) != 1)
+            {
+                throw new Exception("Can't handle this file version");
+            }
+            enumer.MoveNext();
+
+            ControlledBody = new SpaceBody(enumer.Current);
+            enumer.MoveNext();
+
+            IndependentBodies = new List<SpaceBody>();
+            int independentBodyCount = int.Parse(enumer.Current);
+            enumer.MoveNext();
+            for (int i = 0; i < independentBodyCount; i++)
+            {
+                IndependentBodies.Add(new SpaceBody(enumer.Current));
+                enumer.MoveNext();
+            }
+
+            GoalArea = new Circle(enumer.Current);
+            enumer.MoveNext();
+
+            AvoidAreas = new List<Circle>();
+            int avoidAreaCount = int.Parse(enumer.Current);
+            enumer.MoveNext();
+            for (int i = 0; i < avoidAreaCount; i++)
+            {
+                AvoidAreas.Add(new Circle(enumer.Current));
+                enumer.MoveNext();
+            }
+        }
+
         public void Draw(Rect screenBounds)
         {
             GoalArea.Draw(Color.FromArgb(128, Color.Green), screenBounds);
@@ -95,6 +133,41 @@ namespace LevelGenerator
             foreach (var independentBody in IndependentBodies)
             {
                 Console.WriteLine("Independent body: " + independentBody.ToString());
+            }
+        }
+
+        public void Save(string fileName)
+        {
+            using (TextWriter textWriter = new StreamWriter(File.OpenWrite(fileName)))
+            {
+                textWriter.WriteLine("#File Version");
+                textWriter.WriteLine("1");
+
+                textWriter.WriteLine("#Controlled Body");
+                textWriter.WriteLine(SpaceBody.StringDescription());
+                textWriter.WriteLine(ControlledBody.ToString());
+
+                textWriter.WriteLine("#Independent Body Count");
+                textWriter.WriteLine(IndependentBodies.Count);
+                textWriter.WriteLine("#Independent Bodies");
+                textWriter.WriteLine(SpaceBody.StringDescription());
+                foreach (var independentBody in IndependentBodies)
+                {
+                    textWriter.WriteLine(independentBody.ToString());
+                }
+
+                textWriter.WriteLine("#Goal Area");
+                textWriter.WriteLine(Circle.StringDescription());
+                textWriter.WriteLine(GoalArea.ToString());
+
+                textWriter.WriteLine("#Avoid Area Count");
+                textWriter.WriteLine(AvoidAreas.Count);
+                textWriter.WriteLine("#Avoid Areas");
+                textWriter.WriteLine(Circle.StringDescription());
+                foreach (var avoidArea in AvoidAreas)
+                {
+                    textWriter.WriteLine(avoidArea.ToString());
+                }
             }
         }
 

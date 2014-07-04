@@ -49,6 +49,10 @@
             this.AvoidAreaCountUpDown = new System.Windows.Forms.NumericUpDown();
             this.RecalculateBackgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.ResolutionUpDown = new System.Windows.Forms.NumericUpDown();
+            this.SaveButton = new System.Windows.Forms.Button();
+            this.SaveLevelFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.LoadButton = new System.Windows.Forms.Button();
+            this.OpenLevelFileDialog = new System.Windows.Forms.OpenFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.ControlledBodyXPositionUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ControlledBodyYPositionUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ControlledBodyMassUpDown)).BeginInit();
@@ -101,7 +105,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(14, 47);
+            this.label1.Location = new System.Drawing.Point(12, 64);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(81, 13);
             this.label1.TabIndex = 10;
@@ -110,7 +114,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(14, 70);
+            this.label2.Location = new System.Drawing.Point(12, 87);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(44, 13);
             this.label2.TabIndex = 11;
@@ -118,7 +122,7 @@
             // 
             // ControlledBodyXPositionUpDown
             // 
-            this.ControlledBodyXPositionUpDown.Location = new System.Drawing.Point(64, 68);
+            this.ControlledBodyXPositionUpDown.Location = new System.Drawing.Point(62, 85);
             this.ControlledBodyXPositionUpDown.Maximum = new decimal(new int[] {
             480,
             0,
@@ -136,7 +140,7 @@
             // 
             // ControlledBodyYPositionUpDown
             // 
-            this.ControlledBodyYPositionUpDown.Location = new System.Drawing.Point(130, 68);
+            this.ControlledBodyYPositionUpDown.Location = new System.Drawing.Point(128, 85);
             this.ControlledBodyYPositionUpDown.Maximum = new decimal(new int[] {
             320,
             0,
@@ -155,7 +159,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(26, 96);
+            this.label3.Location = new System.Drawing.Point(24, 113);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(32, 13);
             this.label3.TabIndex = 14;
@@ -163,7 +167,7 @@
             // 
             // ControlledBodyMassUpDown
             // 
-            this.ControlledBodyMassUpDown.Location = new System.Drawing.Point(64, 94);
+            this.ControlledBodyMassUpDown.Location = new System.Drawing.Point(62, 111);
             this.ControlledBodyMassUpDown.Maximum = new decimal(new int[] {
             50,
             0,
@@ -187,7 +191,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(18, 121);
+            this.label4.Location = new System.Drawing.Point(16, 138);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(54, 13);
             this.label4.TabIndex = 16;
@@ -195,7 +199,7 @@
             // 
             // GoalAreaRadiusUpDown
             // 
-            this.GoalAreaRadiusUpDown.Location = new System.Drawing.Point(149, 137);
+            this.GoalAreaRadiusUpDown.Location = new System.Drawing.Point(147, 154);
             this.GoalAreaRadiusUpDown.Maximum = new decimal(new int[] {
             960,
             0,
@@ -218,7 +222,7 @@
             // 
             // GoalAreaXPositionUpDown
             // 
-            this.GoalAreaXPositionUpDown.Location = new System.Drawing.Point(17, 137);
+            this.GoalAreaXPositionUpDown.Location = new System.Drawing.Point(15, 154);
             this.GoalAreaXPositionUpDown.Maximum = new decimal(new int[] {
             480,
             0,
@@ -236,7 +240,7 @@
             // 
             // GoalAreaYPositionUpDown
             // 
-            this.GoalAreaYPositionUpDown.Location = new System.Drawing.Point(83, 137);
+            this.GoalAreaYPositionUpDown.Location = new System.Drawing.Point(81, 154);
             this.GoalAreaYPositionUpDown.Maximum = new decimal(new int[] {
             320,
             0,
@@ -255,7 +259,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(14, 173);
+            this.label5.Location = new System.Drawing.Point(12, 190);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(102, 13);
             this.label5.TabIndex = 22;
@@ -263,7 +267,7 @@
             // 
             // IndependentBodyCountUpDown
             // 
-            this.IndependentBodyCountUpDown.Location = new System.Drawing.Point(130, 171);
+            this.IndependentBodyCountUpDown.Location = new System.Drawing.Point(128, 188);
             this.IndependentBodyCountUpDown.Name = "IndependentBodyCountUpDown";
             this.IndependentBodyCountUpDown.Size = new System.Drawing.Size(60, 20);
             this.IndependentBodyCountUpDown.TabIndex = 23;
@@ -272,7 +276,7 @@
             // AvoidAreasLabel
             // 
             this.AvoidAreasLabel.AutoSize = true;
-            this.AvoidAreasLabel.Location = new System.Drawing.Point(52, 230);
+            this.AvoidAreasLabel.Location = new System.Drawing.Point(50, 247);
             this.AvoidAreasLabel.Name = "AvoidAreasLabel";
             this.AvoidAreasLabel.Size = new System.Drawing.Size(64, 13);
             this.AvoidAreasLabel.TabIndex = 24;
@@ -280,7 +284,7 @@
             // 
             // AvoidAreaCountUpDown
             // 
-            this.AvoidAreaCountUpDown.Location = new System.Drawing.Point(130, 228);
+            this.AvoidAreaCountUpDown.Location = new System.Drawing.Point(128, 245);
             this.AvoidAreaCountUpDown.Name = "AvoidAreaCountUpDown";
             this.AvoidAreaCountUpDown.Size = new System.Drawing.Size(60, 20);
             this.AvoidAreaCountUpDown.TabIndex = 25;
@@ -309,11 +313,41 @@
             0});
             this.ResolutionUpDown.ValueChanged += new System.EventHandler(this.ResolutionUpDown_ValueChanged);
             // 
+            // SaveButton
+            // 
+            this.SaveButton.Location = new System.Drawing.Point(94, 37);
+            this.SaveButton.Name = "SaveButton";
+            this.SaveButton.Size = new System.Drawing.Size(75, 23);
+            this.SaveButton.TabIndex = 27;
+            this.SaveButton.Text = "Save";
+            this.SaveButton.UseVisualStyleBackColor = true;
+            this.SaveButton.Click += new System.EventHandler(this.SaveButton_Click);
+            // 
+            // SaveLevelFileDialog
+            // 
+            this.SaveLevelFileDialog.Filter = "Level Files|*.lvl|All files|*.*";
+            // 
+            // LoadButton
+            // 
+            this.LoadButton.Location = new System.Drawing.Point(12, 37);
+            this.LoadButton.Name = "LoadButton";
+            this.LoadButton.Size = new System.Drawing.Size(75, 23);
+            this.LoadButton.TabIndex = 28;
+            this.LoadButton.Text = "Open";
+            this.LoadButton.UseVisualStyleBackColor = true;
+            this.LoadButton.Click += new System.EventHandler(this.LoadButton_Click);
+            // 
+            // OpenLevelFileDialog
+            // 
+            this.OpenLevelFileDialog.Filter = "Level Files|*.lvl|All files|*.*";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1360, 758);
+            this.Controls.Add(this.LoadButton);
+            this.Controls.Add(this.SaveButton);
             this.Controls.Add(this.ResolutionUpDown);
             this.Controls.Add(this.AvoidAreaCountUpDown);
             this.Controls.Add(this.AvoidAreasLabel);
@@ -371,6 +405,10 @@
         private System.Windows.Forms.NumericUpDown AvoidAreaCountUpDown;
         private System.ComponentModel.BackgroundWorker RecalculateBackgroundWorker;
         private System.Windows.Forms.NumericUpDown ResolutionUpDown;
+        private System.Windows.Forms.Button SaveButton;
+        private System.Windows.Forms.SaveFileDialog SaveLevelFileDialog;
+        private System.Windows.Forms.Button LoadButton;
+        private System.Windows.Forms.OpenFileDialog OpenLevelFileDialog;
     }
 }
 

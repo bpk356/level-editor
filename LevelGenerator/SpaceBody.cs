@@ -38,6 +38,19 @@ namespace LevelGenerator
             Radius = radius;
         }
 
+        public SpaceBody(string description)
+        {
+            string[] parts = description.Split(',');
+            float positionX = float.Parse(parts[0]);
+            float positionY = float.Parse(parts[1]);
+            Position = new Vector2(positionX, positionY);
+            float velocityX = float.Parse(parts[2]);
+            float velocityY = float.Parse(parts[3]);
+            Velocity = new Vector2(velocityX, velocityY);
+            Radius = int.Parse(parts[4]);
+            IsStationary = bool.Parse(parts[5]);
+        }
+
         public void Draw(Color color, bool drawVelocity, Rect screenBounds)
         {
             DrawHelper.DrawCircle(Position, Radius, color, screenBounds);
@@ -47,9 +60,14 @@ namespace LevelGenerator
             }
         }
 
+        public static string StringDescription()
+        {
+            return "#PositionX,PositionY,VelocityX,VelocityY,Radius,IsStationary";
+        }
+
         public override string ToString()
         {
-            return "Position: " + Position.ToString() + ", Velocity: " + Velocity.ToString() + ", Mass: " + Mass;
+            return Position.ToString() + "," + Velocity.ToString() + "," + Radius + "," + IsStationary;
         }
 
         public bool IsVisible(Rect bounds)

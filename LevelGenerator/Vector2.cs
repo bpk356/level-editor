@@ -48,7 +48,7 @@ namespace LevelGenerator
 
         public override string ToString()
         {
-            return "(" + X + "," + Y + ")";
+            return X + "," + Y;
         }
 
         public static Vector2 operator +(Vector2 left, Vector2 right)
