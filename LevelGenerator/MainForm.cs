@@ -25,6 +25,7 @@ namespace LevelGenerator
         IDraggableObject _draggingObject;
         Vector2 _draggingOffset;
         List<SpaceBody> _controlledBodyStates;
+        List<List<SpaceBody>> _independentBodyStates;
         bool _showTrajectoryOnMouseMove;
         int _resolution;
 
@@ -259,9 +260,15 @@ namespace LevelGenerator
 
                 if (_controlledBodyStates != null)
                 {
-                    foreach (var controlledBodyState in _controlledBodyStates)
+                    for (int frameI = 0; frameI < _controlledBodyStates.Count; frameI++)
                     {
+                        var controlledBodyState = _controlledBodyStates[frameI];
                         controlledBodyState.Draw(Color.FromArgb(50, Color.SkyBlue), false, _screenBounds);
+                        for (int independentBodyI = 0; independentBodyI < _independentBodyStates.Count; independentBodyI++)
+                        {
+                            var independentBodyState = _independentBodyStates[independentBodyI][frameI];
+                            independentBodyState.Draw(Color.FromArgb(50, Color.Blue), false, _screenBounds);
+                        }
                     }
                 }
 
@@ -513,16 +520,27 @@ namespace LevelGenerator
                 UpdatePicture();
                 DisplayGLControl.Update();
             }
-            else if(_showTrajectoryOnMouseMove)
+            else if (_showTrajectoryOnMouseMove)
             {
                 SimulationState simulationState = new SimulationState(_bestLevel, GLControlMousePositionToWorldCoordinates(e.X, e.Y));
                 List<SpaceBody> controlledBodyStates = new List<SpaceBody>();
+                List<List<SpaceBody>> independentBodyStates = new List<List<SpaceBody>>();
+                foreach (var independentBody in simulationState.IndependentBodies)
+                {
+                    independentBodyStates.Add(new List<SpaceBody>());
+                }
                 for (int i = 0; i < SimulationState.SimulationFramesPerSecond * 15; i++)
                 {
                     controlledBodyStates.Add(new SpaceBody(simulationState.ControlledBody));
+                    for (int independentBodyI = 0; independentBodyI < simulationState.IndependentBodies.Count; independentBodyI++)
+                    {
+                        var independentBody = simulationState.IndependentBodies[independentBodyI];
+                        independentBodyStates[independentBodyI].Add(new SpaceBody(independentBody));
+                    }
                     simulationState.MoveBodies();
                 }
                 _controlledBodyStates = controlledBodyStates;
+                _independentBodyStates = independentBodyStates;
                 UpdatePicture();
             }
         }

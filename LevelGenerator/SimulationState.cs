@@ -9,7 +9,7 @@ namespace LevelGenerator
 {
     class SimulationState
     {
-        public const int SimulationFramesPerSecond = 30;
+        public const int SimulationFramesPerSecond = 50;
         public const float FrameDeltaTime = 1.0f / SimulationFramesPerSecond;
         public List<SpaceBody> IndependentBodies { get; set; }
         public Circle GoalArea { get; set; }

@@ -53,6 +53,10 @@ namespace LevelGenerator
 
         public void Draw(Color color, bool drawVelocity, Rect screenBounds)
         {
+            if (Radius == 0)
+            {
+                return;
+            }
             DrawHelper.DrawCircle(Position, Radius, color, screenBounds);
             if (drawVelocity)
             {
