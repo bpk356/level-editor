@@ -267,7 +267,7 @@ namespace LevelGenerator
                         for (int independentBodyI = 0; independentBodyI < _independentBodyStates.Count; independentBodyI++)
                         {
                             var independentBodyState = _independentBodyStates[independentBodyI][frameI];
-                            independentBodyState.Draw(Color.FromArgb(50, Color.Blue), false, _screenBounds);
+                            independentBodyState.Draw(Color.FromArgb(50, independentBodyState.IsStationary ? Color.Purple : Color.Blue), false, _screenBounds);
                         }
                     }
                 }

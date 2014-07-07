@@ -46,6 +46,11 @@ namespace LevelGenerator
             
         }
 
+        public float Dot(Vector2 other)
+        {
+            return X * other.X + Y * other.Y;
+        }
+
         public override string ToString()
         {
             return X + "," + Y;

@@ -13,9 +13,20 @@ namespace LevelGenerator
 
         public Vector2 Position { get; set; }
         public Vector2 Velocity { get; set; }
-        public int Radius { get; set; }
-        public float Mass { get { return (float)Math.Pow(10, Radius / 4); } }
+        public float Radius { get; set; }
+        public float Mass 
+        {
+            get
+            {
+                return (float)Math.Pow(Radius, 3.0) * 0.5f;
+            }
+            set
+            {
+                Radius = (float)Math.Pow(value / 0.5, 1.0 / 3.0);
+            }
+        }
         public bool IsStationary { get; set; }
+        public bool IsDestroyed { get; set; }
 
         public const int MutatableAttributeCount = Vector2.MutatableAttributeCount * 2 + 2;
 
@@ -29,6 +40,7 @@ namespace LevelGenerator
             } while (VelocityWillGoOffscreen(bounds));
             Velocity = new Vector2(0, 0);
             IsStationary = false;
+            IsDestroyed = false;
         }
 
         public SpaceBody(Vector2 position, Vector2 velocity, int radius)
@@ -36,6 +48,7 @@ namespace LevelGenerator
             Position = position;
             Velocity = velocity;
             Radius = radius;
+            IsDestroyed = false;
         }
 
         public SpaceBody(string description)
@@ -49,10 +62,15 @@ namespace LevelGenerator
             Velocity = new Vector2(velocityX, velocityY);
             Radius = int.Parse(parts[4]);
             IsStationary = bool.Parse(parts[5]);
+            IsDestroyed = false;
         }
 
         public void Draw(Color color, bool drawVelocity, Rect screenBounds)
         {
+            if (IsDestroyed)
+            {
+                return;
+            }
             if (Radius == 0)
             {
                 return;
@@ -79,14 +97,26 @@ namespace LevelGenerator
             return bounds.ContainsPoint(Position);
         }
 
-        public bool SimulateMotion(IEnumerable<SpaceBody> allBodies, float deltaTime)
+        public void UpdateVelocity(IEnumerable<SpaceBody> allBodies, float deltaTime)
         {
+            if (IsDestroyed)
+            {
+                return;
+            }
+            if (IsStationary)
+            {
+                return;
+            }
             Vector2 totalForce = new Vector2(0, 0);
             int bodyCount = 0;
 
             foreach (var body in allBodies)
             {
                 if (body == this)
+                {
+                    continue;
+                }
+                if (body.IsDestroyed)
                 {
                     continue;
                 }
@@ -100,22 +130,25 @@ namespace LevelGenerator
                     totalForce += directedForce;
                     bodyCount++;
                 }
-                else
-                {
-                    return true;
-                }
+            }
+            if (bodyCount > 0)
+            {
+                Vector2 averageForce = totalForce / bodyCount;
+                Vector2 acceleration = averageForce / Mass;
+                Velocity += acceleration * deltaTime;
+            }
+        }
+
+        public void UpdatePosition(float deltaTime)
+        {
+            if (IsDestroyed)
+            {
+                return;
             }
             if (!IsStationary)
             {
-                if (bodyCount > 0)
-                {
-                    Vector2 averageForce = totalForce / bodyCount;
-                    Vector2 acceleration = averageForce / Mass;
-                    Velocity += acceleration * deltaTime;
-                }
                 Position += Velocity * deltaTime;
             }
-            return false;
         }
 
         public SpaceBody(SpaceBody other)
@@ -124,6 +157,7 @@ namespace LevelGenerator
             Velocity = new Vector2(other.Velocity);
             Radius = other.Radius;
             IsStationary = other.IsStationary;
+            IsDestroyed = other.IsDestroyed;
         }
 
         bool VelocityWillGoOffscreen(Rect bounds)

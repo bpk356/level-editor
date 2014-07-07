@@ -55,17 +55,98 @@ namespace LevelGenerator
             return true;
         }
 
+        public bool BodiesWillCollide(SpaceBody pa, SpaceBody pb, float deltaTime)
+        { 
+            Vector2 s = pa.Position - pb.Position; // vector between the centers of each sphere
+            Vector2 v = pa.Velocity - pb.Velocity; // relative velocity between spheres
+            float r = pa.Radius + pb.Radius;
+            float t;
+ 
+            float c = s.Dot(s) - r*r; // if negative, they overlap
+            if (c < 0.0f) // if true, they already overlap
+            {
+                t = 0.0f;
+                return true;
+            }
+ 
+            float a = v.Dot(v);
+            //if (a &lt; EPSILON)
+            //  return false; // does not move towards each other
+ 
+            float b = v.Dot(s);
+            if (b <= 0.0f)
+                return false; // does not move towards each other
+ 
+            float d = b*b - a*c;
+            if (d < 0.0f)
+                return false; // no real roots ... no collision
+ 
+            t = (-b - (float)Math.Sqrt(d)) / a;
+ 
+            return t < deltaTime;
+        }
+
         public bool MoveBodies()
         {
-            bool collision = false;
+            bool fatalCollision = false;
             foreach (var body in AllBodies())
             {
-                if (body.SimulateMotion(AllBodies(), FrameDeltaTime))
+                body.UpdateVelocity(AllBodies(), FrameDeltaTime);
+            }
+            foreach (var body in AllBodies())
+            {
+                if (body.IsDestroyed)
                 {
-                    collision = true;
+                    continue;
+                }
+                foreach (var otherBody in AllBodies())
+                {
+                    if (otherBody.IsDestroyed)
+                    {
+                        continue;
+                    }
+                    if (body == otherBody)
+                    {
+                        continue;
+                    }
+                    if (BodiesWillCollide(body, otherBody, FrameDeltaTime))
+                    {
+                        SpaceBody greaterBody;
+                        SpaceBody lesserBody;
+                        if (body.Mass > otherBody.Mass ||
+                            (body.Mass == otherBody.Mass && otherBody != ControlledBody))
+                        {
+                            greaterBody = body;
+                            lesserBody = otherBody;
+                        }
+                        else
+                        {
+                            greaterBody = otherBody;
+                            lesserBody = body;
+                        }
+
+                        if (lesserBody == ControlledBody)
+                        {
+                            fatalCollision = true;
+                        }
+
+                        float totalMass = greaterBody.Mass + lesserBody.Mass;
+                        Vector2 averageVelocity = (greaterBody.Velocity * greaterBody.Mass + lesserBody.Velocity * lesserBody.Mass) / totalMass;
+                        Vector2 averagePosition = (greaterBody.Position * greaterBody.Mass + lesserBody.Position * lesserBody.Mass) / totalMass;
+                        greaterBody.Mass = totalMass;
+                        lesserBody.Mass = 0.0f;
+                        greaterBody.Velocity = averageVelocity;
+                        lesserBody.Velocity = new Vector2(0, 0);
+                        greaterBody.Position = averagePosition;
+                        lesserBody.IsDestroyed = true;
+                    }
                 }
             }
-            return collision;
+            foreach (var body in AllBodies())
+            {
+                body.UpdatePosition(FrameDeltaTime);
+            }
+            return fatalCollision;
         }
 
         public void Draw(Rect screenBounds)
