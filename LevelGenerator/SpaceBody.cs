@@ -14,15 +14,16 @@ namespace LevelGenerator
         public Vector2 Position { get; set; }
         public Vector2 Velocity { get; set; }
         public float Radius { get; set; }
+        private const float MassConstant = 0.25f;
         public float Mass 
         {
             get
             {
-                return (float)Math.Pow(Radius, 3.0) * 0.5f;
+                return (float)Math.Pow(Radius, 3.0) * MassConstant;
             }
             set
             {
-                Radius = (float)Math.Pow(value / 0.5, 1.0 / 3.0);
+                Radius = (float)Math.Pow(value / MassConstant, 1.0 / 3.0);
             }
         }
         public bool IsStationary { get; set; }

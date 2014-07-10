@@ -246,7 +246,7 @@ namespace LevelGenerator
                     {
                         foreach (var kvp in _bestTryDictionary)
                         {
-                            DrawHelper.SetPixel(kvp.Key, Color.FromArgb(50, kvp.Value ? Color.White : Color.Red), _screenBounds, _resolution);
+                            DrawHelper.SetPixel(kvp.Key, Color.FromArgb(100, kvp.Value ? Color.White : Color.Red), _screenBounds, _resolution);
                         }
                     }
                 }

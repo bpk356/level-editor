@@ -74,7 +74,7 @@ namespace LevelGenerator
             //  return false; // does not move towards each other
  
             float b = v.Dot(s);
-            if (b <= 0.0f)
+            if (b >= 0.0f)
                 return false; // does not move towards each other
  
             float d = b*b - a*c;
